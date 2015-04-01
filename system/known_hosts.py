@@ -127,6 +127,13 @@ def enforce_state(module, params):
             else:
                 module.fail_json(msg="Failed to read %s: %s" % \
                                      (path,str(e)))
+        #If containing directory doesn't exist, create it iff it's ~/.ssh
+        dir=os.path.dirname(path)
+        if os.path.exists(dir)==False:
+            if dir==os.path.expanduser("~/.ssh"):
+                os.mkdir(dir,0700)
+            else:
+                module.fail_json(msg="Directory (%s) for known_hosts file doesn't exist" % dir)
         try:
             outf=tempfile.NamedTemporaryFile(dir=os.path.dirname(path),
                                              delete=False)
